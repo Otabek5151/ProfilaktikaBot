@@ -1,4 +1,7 @@
 import gspread
+import json
+import os
+
 from google.oauth2.service_account import Credentials
 
 
@@ -8,10 +11,18 @@ SCOPES = [
 ]
 
 
-credentials = Credentials.from_service_account_file(
-    "credentials.json",
-    scopes=SCOPES
-)
+credentials_json = os.getenv("GOOGLE_CREDENTIALS_JSON")
+
+if credentials_json:
+    credentials = Credentials.from_service_account_info(
+        json.loads(credentials_json),
+        scopes=SCOPES
+    )
+else:
+    credentials = Credentials.from_service_account_file(
+        "credentials.json",
+        scopes=SCOPES
+    )
 
 client = gspread.authorize(credentials)
 
