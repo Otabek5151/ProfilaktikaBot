@@ -1,5 +1,6 @@
 import asyncio
 import os
+from aiohttp import web
 from datetime import datetime
 
 from aiogram import Bot, Dispatcher, types, F
@@ -798,10 +799,53 @@ async def cancel_profilaktika(
 
 
 # =========================================================
+# RENDER WEB SERVER
+# =========================================================
+
+async def health_check(request):
+    return web.Response(
+        text="Profilaktika Bot ishlayapti!"
+    )
+
+
+async def start_web_server():
+
+    app = web.Application()
+
+    app.router.add_get(
+        "/",
+        health_check
+    )
+
+    runner = web.AppRunner(app)
+
+    await runner.setup()
+
+    port = int(
+        os.getenv("PORT", "10000")
+    )
+
+    site = web.TCPSite(
+        runner,
+        "0.0.0.0",
+        port
+    )
+
+    await site.start()
+
+    print(
+        f"Web server {port} portda ishga tushdi."
+    )
+
+
+# =========================================================
 # BOTNI ISHGA TUSHIRISH
 # =========================================================
 
 async def main():
+
+    # Render web server
+    await start_web_server()
 
     bot = Bot(
         token=BOT_TOKEN
